@@ -1,0 +1,180 @@
+[colors]
+background = #D91e1e2e
+foreground = #cdd6f4
+accent     = #89b4fa
+focused-border = #4c7899
+muted      = #585b70
+good       = #a6e3a1
+warn       = #f9e2af
+bad        = #f38ba8
+
+[bar/base]
+; i3 forcibly stretches dock-type windows to full output width unless they
+; bypass window-manager placement entirely - required for width/offset to work.
+override-redirect = true
+
+width = 98%
+height = 32
+offset-x = 1%
+offset-y = 8
+radius = 14
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+line-size = 0
+
+border-size = 2
+border-color = ${colors.focused-border}
+
+padding-left = 2
+padding-right = 2
+module-margin = 1
+
+font-0 = monospace:size=9;2
+font-1 = MesloLGS Nerd Font Mono:size=18;5
+
+modules-left = i3 sep date
+modules-right = {{MODULES_RIGHT}}
+
+wm-restack = i3
+enable-ipc = true
+
+[bar/main]
+inherit = bar/base
+; set per-instance by launch.sh, which spawns one of these per connected
+; output - so this config never needs a hardcoded monitor name.
+monitor = ${env:MONITOR}
+
+[module/i3]
+type = internal/i3
+pin-workspaces = true
+strip-wsnumbers = false
+index-sort = true
+enable-click = true
+enable-scroll = false
+
+label-focused = "│%index%│"
+label-focused-foreground = ${colors.foreground}
+label-focused-overline = ${colors.focused-border}
+label-focused-underline = ${colors.focused-border}
+label-focused-padding = 2
+
+label-unfocused = %index%
+label-unfocused-foreground = ${colors.foreground}
+label-unfocused-padding = 2
+
+label-visible = %index%
+label-visible-foreground = ${colors.foreground}
+label-visible-padding = 2
+
+label-urgent = %index%
+label-urgent-background = ${colors.bad}
+label-urgent-foreground = ${colors.background}
+label-urgent-padding = 2
+
+[module/network]
+type = custom/script
+exec = ~/.config/polybar/scripts/network-status.sh
+interval = 5
+format = <label>
+label = %output%
+label-foreground = ${colors.foreground}
+click-left = networkmanager_dmenu
+
+[module/bluetooth]
+type = custom/script
+exec = ~/.config/polybar/scripts/bluetooth-status.sh
+tail = true
+format = <label>
+label = %output%
+label-foreground = ${colors.foreground}
+click-left = ~/.config/polybar/scripts/bluetooth-menu.sh
+
+[module/volume]
+type = custom/script
+exec = ~/.config/polybar/scripts/volume-status.sh
+tail = true
+format = <label>
+label = %output%
+label-foreground = ${colors.foreground}
+click-left = ~/.config/polybar/scripts/audio-switcher.py
+scroll-up = pactl set-sink-volume @DEFAULT_SINK@ +5%
+scroll-down = pactl set-sink-volume @DEFAULT_SINK@ -5%
+
+[module/cpu]
+type = internal/cpu
+interval = 2
+format = <label>
+format-prefix = "%{T2}󰍛%{T-} "
+format-prefix-foreground = ${colors.foreground}
+label = %percentage%%
+
+[module/temperature]
+type = internal/temperature
+thermal-zone = {{THERMAL_ZONE}}
+warn-temperature = 80
+units = true
+format = <label>
+format-prefix = "%{T2}%{T-} "
+format-prefix-foreground = ${colors.foreground}
+format-warn = <label-warn>
+format-warn-prefix = "%{T2}%{T-} "
+format-warn-prefix-foreground = ${colors.bad}
+label = %temperature-c%
+label-warn = %temperature-c%
+label-warn-foreground = ${colors.bad}
+
+[module/memory]
+type = internal/memory
+format = <label>
+format-prefix = "%{T2}󰍛%{T-} "
+format-prefix-foreground = ${colors.foreground}
+label = %percentage_used%%
+
+[module/battery]
+type = internal/battery
+battery = {{BATTERY}}
+adapter = {{ADAPTER}}
+
+format-charging = <ramp-capacity> <label-charging>
+format-discharging = <ramp-capacity> <label-discharging>
+format-full = <ramp-capacity> <label-full>
+
+label-charging = "CHG %percentage%%"
+label-discharging = "BAT %percentage%%"
+label-full = "%percentage%%"
+
+ramp-capacity-0 = %{T2}%{T-}
+ramp-capacity-1 = %{T2}%{T-}
+ramp-capacity-2 = %{T2}%{T-}
+ramp-capacity-3 = %{T2}%{T-}
+ramp-capacity-4 = %{T2}%{T-}
+
+[module/clipboard]
+type = custom/text
+format = "%{T2}%{T-}"
+format-foreground = ${colors.foreground}
+format-padding = 1
+click-left = ~/.config/polybar/scripts/clipboard-menu.sh
+
+[module/power]
+type = custom/text
+format = "%{T2}󰍛%{T-}"
+format-foreground = ${colors.foreground}
+format-padding = 1
+click-left = ~/.config/polybar/scripts/powermenu.sh
+
+[module/sep]
+type = custom/text
+format = "│"
+format-foreground = ${colors.muted}
+format-padding = 0
+
+[module/date]
+type = internal/date
+date = %m/%d/%y
+time = %I:%M %p
+label = "%date% %time%"
+
+[settings]
+screenchange-reload = true
